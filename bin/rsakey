@@ -1,0 +1,23 @@
+#!/usr/bin/env ruby
+require 'path'
+if ARGV.count == 1
+  begin
+    name_or_path = ARGV.first
+    path = Path.find(name_or_path)
+    raise Path::PathNotChanged.new(path.to_s) if path.changed?
+
+    Path.base_remove!
+    path.link!
+    puts path.changed? ? "key assigned properly!" : "ups something went wrong"
+  rescue Path::NoLinkFound => e
+    puts "This is not a link: #{e.path}"
+  rescue Path::PathNotFound => e
+    puts "No path found for: #{e.path}"
+  rescue Path::PathNotChanged => e
+    puts "Path hasn't changed: #{Path::BASE} => #{e.path}"
+  rescue => e
+    raise e
+  end
+else
+  puts "you should pass 1 parameter"
+end
